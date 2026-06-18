@@ -28,11 +28,12 @@
 #define LCD_BACKLIGHT 0x08
 #define LCD_ENABLE    0x04
 
-#define CAP_MAX         5000.0f // mL
+#define CAP_MAX  4800.0f // mL
+#define CAP_MIN  600.0f//ml
 
 float setpoint = 2600.0f; // nível desejado
 
-#define TEMPO_MAX_ENCHIMENTO_S 3000000000000
+#define TEMPO_MAX_ENCHIMENTO_S 300000000000
 
 
 absolute_time_t inicio_enchimento;
@@ -119,12 +120,12 @@ void lcd_set_cursor(uint8_t row, uint8_t col)
 
 float volume_inferior(float tensao)
 {
-    return exp((tensao + 8.7456f)/1.3833f); //valor solda //exp((tensao + 5.5865f)/1.0064f); //valor barra inox//exp((tensao + 4.3396f)/0.8455f); //valor 1 calibracao
+    return exp((tensao + 8.7028f)/1.3781f); //valor solda //exp((tensao + 5.5865f)/1.0064f); //valor barra inox//exp((tensao + 4.3396f)/0.8455f); //valor 1 calibracao
 }
 
 float volume_superior(float tensao)
 {
-    return exp((tensao + 8.6557f)/1.3807f); //valor solda //exp((tensao + 4.8861f)/0.9378f); //valor barra inox //exp((tensao + 4.3739f)/0.8518f);//valor 1 calibracao
+    return exp((tensao + 8.5945f)/1.37f); //valor solda //exp((tensao + 4.8861f)/0.9378f); //valor barra inox //exp((tensao + 4.3739f)/0.8518f);//valor 1 calibracao
 }
 
 // Histerese usando as duas curvas
@@ -305,7 +306,10 @@ int main()
         // Incrementos de 200 mL
         int volume_display =
             ((int)(volume/200.0f))*200;
-
+        if (volume_display < CAP_MIN)
+        {
+            volume_display=0;
+        }
         // Controle do nível
         bool pode_mudar_estado =
         (
